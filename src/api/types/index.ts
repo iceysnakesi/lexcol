@@ -1,6 +1,9 @@
 interface User {
     readonly id: string;
     name: string;
-    email: string;
     //avatarUrl?: string;
+}
+
+interface Admin extends User {
+    role: 'admin';
 }
