@@ -44,6 +44,10 @@
           <span v-else>Sign In</span>
         </button>
       </form>
+
+      <div class="footer-action">
+        <p>Don't have an account? <router-link to="/register">Register here</router-link></p>
+      </div>
     </div>
   </div>
 </template>

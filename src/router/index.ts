@@ -3,6 +3,7 @@ import HomeLayout from "@/layouts/HomeLayout.vue";
 import Dashboard from "@/views/Dashboard.vue";
 import About from "@/views/About.vue";
 import LoginView from "@/views/LoginView.vue";
+import RegisterView from "@/views/Register.vue";
 const routes = [
   {
     path: "/",
@@ -25,7 +26,12 @@ const routes = [
     path: "/login",
     name: "Login",
     component: LoginView,
-  }
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: RegisterView,
+  },
 ];
 
 const router = createRouter({

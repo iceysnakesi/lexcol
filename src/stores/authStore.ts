@@ -20,13 +20,12 @@ export const useAuthStore = defineStore('auth', () => {
     return Date.now() - lastFetchedAt.value < 300000; // 5 min cache
   });
 
-  /* Actions
+  // Actions
   async function login(credentials: LoginRequest): Promise<void> {
     status.value = AuthStatus.LOADING;
     errorMessage.value = null;
 
     try {
-      // Replace with your backend endpoint when ready
       const response: AxiosResponse<AuthResponse> = await apiClient.post('/api/auth/login', credentials);
 
       accessToken.value = response.data.accessToken;
@@ -35,50 +34,6 @@ export const useAuthStore = defineStore('auth', () => {
       lastFetchedAt.value = Date.now();
 
       localStorage.setItem('access_token', response.data.accessToken);
-    } catch (error: unknown) {
-      status.value = AuthStatus.ERROR;
-      if (error instanceof Error) {
-        errorMessage.value = error.message;
-      } else {
-        errorMessage.value = 'An unexpected authentication error occurred.';
-      }
-      throw error;
-    }
-  }
-*/
-
-  // Temporary Mock Login for Frontend Testing
-  async function login(credentials: LoginRequest): Promise<void> {
-    status.value = AuthStatus.LOADING;
-    errorMessage.value = null;
-
-    try {
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // Mock validation rule (accepts any email with a password)
-      if (!credentials.email || !credentials.passwordHash) {
-        throw new Error('Please enter both email and password.');
-      }
-
-      // Simulated successful backend response
-      const mockResponse: AuthResponse = {
-        accessToken: 'mock-jwt-token-12345',
-        refreshToken: 'mock-refresh-token-67890',
-        user: {
-          id: 'user-1',
-          email: credentials.email,
-          username: credentials.email.split('@')[0],
-          roles: ['User'],
-        },
-      };
-
-      accessToken.value = mockResponse.accessToken;
-      user.value = mockResponse.user;
-      status.value = AuthStatus.AUTHENTICATED;
-      lastFetchedAt.value = Date.now();
-
-      localStorage.setItem('access_token', mockResponse.accessToken);
     } catch (error: unknown) {
       status.value = AuthStatus.ERROR;
       if (error instanceof Error) {
