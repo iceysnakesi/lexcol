@@ -1,14 +1,11 @@
-<script setup lang="ts">
-</script>
-
 <template>
-  <div id="app">
-    <PageHeader />
-    <main>
-      <router-view />
-    </main>
-    <PageFooter />
+  <div class="app">
+    <router-view /> 
   </div>
 </template>
 
-<style scoped></style>
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+</script>

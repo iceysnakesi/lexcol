@@ -3,6 +3,10 @@
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     "types": ["node"],
+    "strict": true,
+    "baseUrl": "./",
+    "moduleResolution": "node",
+
     // Extra safety for array and object lookups, but may have false positives.
     "noUncheckedIndexedAccess": true,
 

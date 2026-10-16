@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeLayout from "@/layouts/HomeLayout.vue";
 import Dashboard from "@/views/Dashboard.vue";
 import About from "@/views/About.vue";
+import LoginView from "@/views/LoginView.vue";
 const routes = [
   {
     path: "/",
@@ -9,21 +10,26 @@ const routes = [
     component: HomeLayout,
     children: [
       {
-        path: "/Dashboard",
+        path: "dashboard",
         name: "Dashboard",
         component: Dashboard,
       },
       {
-        path: "/about",
+        path: "about",
         name: "About",
         component: About,
-      }
+      },
     ],
   },
+  {
+    path: "/login",
+    name: "Login",
+    component: LoginView,
+  }
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 });
 

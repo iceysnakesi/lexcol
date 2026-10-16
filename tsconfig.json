@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "strict": true,
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": "./",
+    "moduleResolution": "node",
   },
   "files": [],
   "references": [
