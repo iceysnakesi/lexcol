@@ -7,6 +7,9 @@
     </ion-content>
     
     <PageFooter />
+
+    <!-- Modular Mobile Navigation Bar -->
+    <MobileNavBar />
   </ion-page>
 </template>
 
@@ -14,6 +17,7 @@
 import { IonPage, IonContent, IonRouterOutlet } from '@ionic/vue';
 import PageHeader from '@/components/PageHeader.vue';
 import PageFooter from '@/components/PageFooter.vue';
+import MobileNavBar from '@/components/MobileNavBar.vue';
 </script>
 
 <style scoped>

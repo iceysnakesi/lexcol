@@ -5,58 +5,61 @@
         <h2>User Management</h2>
         <p class="subtitle">Manage user roles and membership tiers</p>
 
-        <ion-list class="custom-list">
-          <ion-item v-for="user in users" :key="user.id || user._id" class="user-card">
-            <!-- Optional Profile Avatar / Icon -->
-            <ion-avatar slot="start" class="user-avatar">
-              <img v-if="user.avatarUrl" :src="user.avatarUrl" alt="Avatar" />
-              <div v-else class="avatar-placeholder">
-                {{ (user.username || user.email || 'U').charAt(0).toUpperCase() }}
-              </div>
-            </ion-avatar>
+        <div class="user-list">
+  <div v-for="user in users" :key="user.id" class="user-card">
+    
+    <!-- Left / Top: Avatar & User Info -->
+    <div class="user-info-section">
+      <ion-avatar class="user-avatar">
+        <img v-if="user.avatarUrl" :src="user.avatarUrl" alt="Avatar" />
+        <div v-else class="avatar-placeholder">
+          {{ (user.username || user.email || 'U').charAt(0).toUpperCase() }}
+        </div>
+      </ion-avatar>
 
-            <ion-label>
-              <h3><strong>{{ user.username || user.name || 'Unnamed User' }}</strong></h3>
-              <p class="user-email">{{ user.email || 'No email provided' }}</p>
-              <p class="user-meta">
-                Role: <span class="badge">{{ user.role || 'user' }}</span> | 
-                Tier: <span class="badge">{{ user.membership_tier || 'standard' }}</span>
-              </p>
-            </ion-label>
-            
-            <div slot="end" class="action-buttons">
-              <!-- Dynamic Role Toggle -->
-              <ion-button 
-                size="small" 
-                color="medium" 
-                @click="demoteToUser(user.id || user._id)" 
-                v-if="user.role === 'admin'"
-              >
-                Demote to User
-              </ion-button>
-              <ion-button 
-                size="small" 
-                @click="promoteToAdmin(user.id || user._id)" 
-                v-else
-              >
-                Make Admin
-              </ion-button>
+      <div class="user-details">
+        <h3><strong>{{ user.username || 'Unnamed User' }}</strong></h3>
+        <p class="user-email">{{ user.email || 'No email provided' }}</p>
+        <p class="user-meta">
+          Role: <span class="badge">{{ user.role || 'user' }}</span> | 
+          Tier: <span class="badge">{{ user.membership_tier || 'standard' }}</span>
+        </p>
+      </div>
+    </div>
 
-              <!-- Membership Tier Dropdown -->
-              <ion-select 
-                :value="user.membership_tier || 'standard'" 
-                @ionChange="updateUserTier(user, $event)"
-                interface="popover"
-                placeholder="Select Tier"
-                class="tier-select"
-              >
-                <ion-select-option value="free">Standard</ion-select-option>
-                <ion-select-option value="pro">Pro</ion-select-option>
-                <ion-select-option value="enterprise">Enterprise</ion-select-option>
-              </ion-select>
-            </div>
-          </ion-item>
-        </ion-list>
+    <!-- Right / Bottom: Actions & Dropdown -->
+    <div class="action-section">
+      <ion-button 
+        size="small" 
+        color="medium" 
+        @click="demoteToUser(user.id)" 
+        v-if="user.role === 'admin'"
+      >
+        Demote
+      </ion-button>
+      <ion-button 
+        size="small" 
+        @click="promoteToAdmin(user.id)" 
+        v-else
+      >
+        Make Admin
+      </ion-button>
+
+      <ion-select 
+  :value="user.membership_tier || 'standard'" 
+  @ionChange="updateUserTier(user, $event)"
+  interface="popover"
+  placeholder=""
+  class="tier-select"
+>
+  <ion-select-option value="free">Standard</ion-select-option>
+  <ion-select-option value="pro">Pro</ion-select-option>
+  <ion-select-option value="enterprise">Enterprise</ion-select-option>
+</ion-select>
+    </div>
+
+  </div>
+</div>
       </div>
     </ion-content>
   </ion-page>
@@ -66,12 +69,12 @@
 import { ref, onMounted } from 'vue';
 import { apiClient } from '@/services/apiClient';
 import { 
-  IonPage, IonContent, IonButton, IonList, IonItem, IonLabel, IonAvatar,
+  IonPage, IonContent, IonButton, IonAvatar,
   IonSelect, IonSelectOption
 } from '@ionic/vue';
 import { UserDto } from '@/models/auth';
 
-const users = ref<any[]>([]);
+const users = ref<UserDto[]>([]);
 
 const fetchUsers = async () => {
   try {
@@ -123,9 +126,10 @@ onMounted(() => {
 
 <style scoped>
 .admin-container {
-  max-width: 90%;
+  width: 90%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
 .subtitle {
@@ -133,28 +137,33 @@ onMounted(() => {
   margin-bottom: 1.5rem;
 }
 
-.user-card {
-  margin-bottom: 0.75rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  --background: #ffffff;
-}
-
-.badge {
-  font-weight: bold;
-  color: #3b82f6;
-  text-transform: uppercase;
-  font-size: 0.8rem;
-}
-
-.action-buttons {
+.user-list {
   display: flex;
+  flex-direction: column;
   gap: 1rem;
-  padding: 0 0.5rem;
+}
+
+.user-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.user-info-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .user-avatar {
-  margin-right: 12px;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
 }
 
 .avatar-placeholder {
@@ -166,16 +175,85 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  border-radius: 10%;
+  border-radius: 50%;
+}
+
+.user-details h3 {
+  margin: 0;
+  font-size: 1rem;
 }
 
 .user-email {
   color: #4b5563;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  margin: 2px 0;
 }
 
 .user-meta {
-  margin-top: 4px;
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.badge {
+  font-weight: bold;
+  color: #3b82f6;
+  text-transform: uppercase;
+}
+
+.action-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 0.75rem;
+}
+
+.tier-select {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  width: 105px !important;
   font-size: 0.85rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #f9fafb;
+}
+
+.tier-select::part(container) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.tier-select::part(text) {
+  flex-grow: 1;
+  text-align: center;
+  margin-right: 4px; /* Slight offset so text doesn't crowd the arrow */
+}
+
+.tier-select::part(icon) {
+  opacity: 0.6;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* DESKTOP & TABLET VIEW (Screens 768px and wider): 1 Single Row */
+@media (min-width: 768px) {
+  .user-card {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+  }
+
+  .action-section {
+    border-top: none;
+    padding-top: 0;
+    justify-content: flex-end;
+  }
 }
 </style>
