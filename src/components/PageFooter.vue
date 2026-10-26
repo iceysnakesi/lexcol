@@ -1,20 +1,28 @@
 <template>
-  <footer class="page-footer">
-    <p>&copy; {{ currentYear }} lexcol. All rights reserved.</p>
-  </footer>
+  <ion-footer>
+    <ion-toolbar class="footer-toolbar">
+      <p class="footer-text">&copy; {{ currentYear }} lexcol. All rights reserved.</p>
+    </ion-toolbar>
+  </ion-footer>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-const currentYear = computed(() => new Date().getFullYear())
+import { computed } from 'vue';
+import { IonFooter, IonToolbar } from '@ionic/vue';
+
+const currentYear = computed(() => new Date().getFullYear());
 </script>
 
 <style scoped>
-.page-footer {
+.footer-toolbar {
+  --background: #f5f5f5;
+  --color: #333;
   text-align: center;
-  padding: 1.5rem;
-  background-color: #f5f5f5;
-  color: #333;
-  margin-top: auto;
+}
+
+.footer-text {
+  width: 100%;
+  margin: 0;
+  font-size: 0.9rem;
 }
 </style>

@@ -17,7 +17,9 @@ const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
 app.use(pinia);
-app.use(IonicVue);
+app.use(IonicVue, {
+  animated: false,
+});
 app.use(router);
 
 // Router waits for the app to be ready before mounting

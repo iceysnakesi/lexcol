@@ -1,73 +1,69 @@
 <template>
-  <div class="register-page">
-    <div class="register-container">
-      <div class="header-section">
-        <h2>Create Account</h2>
-        <p class="subtitle">Sign up to get started with Lexcol</p>
-      </div>
-      
-      <form @submit.prevent="handleRegister">
-        <div class="input-group">
-          <label for="name">Full Name</label>
-          <input
-            id="name"
-            v-model="name"
-            type="text"
-            required
-            placeholder="Juan Pérez"
-            autocomplete="name"
-          />
-        </div>
+  <AuthLayout title="Create Account" subtitle="Sign up to get started with Lexcol">
+    <form @submit.prevent="handleRegister">
+      <ion-item class="custom-item">
+        <ion-input
+          v-model="name"
+          label="Full Name"
+          label-placement="stacked"
+          type="text"
+          required
+          placeholder="Juan Pérez"
+          autocomplete="name"
+        ></ion-input>
+      </ion-item>
 
-        <div class="input-group">
-          <label for="email">Email Address</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            required
-            placeholder="user@example.com"
-            autocomplete="email"
-          />
-        </div>
+      <ion-item class="custom-item">
+        <ion-input
+          v-model="email"
+          label="Email Address"
+          label-placement="stacked"
+          type="email"
+          required
+          placeholder="user@example.com"
+          autocomplete="email"
+        ></ion-input>
+      </ion-item>
 
-        <div class="input-group">
-          <label for="password">Password</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            required
-            placeholder="Create a password"
-            autocomplete="new-password"
-          />
-        </div>
+      <ion-item class="custom-item">
+        <ion-input
+          v-model="password"
+          label="Password"
+          label-placement="stacked"
+          type="password"
+          required
+          placeholder="Create a password"
+          autocomplete="new-password"
+        ></ion-input>
+      </ion-item>
 
-        <p class="error-text" v-if="errorMessage">
-          {{ errorMessage }}
-        </p>
+      <p class="error-text" v-if="errorMessage">
+        {{ errorMessage }}
+      </p>
 
-        <button
-          type="submit"
-          class="submit-btn"
-          :disabled="isLoading"
-        >
-          <span v-if="isLoading">Creating account...</span>
-          <span v-else>Register</span>
-        </button>
-      </form>
+      <ion-button
+        expand="block"
+        type="submit"
+        :disabled="isLoading"
+        class="submit-btn"
+      >
+        <span v-if="isLoading">Creating account...</span>
+        <span v-else>Register</span>
+      </ion-button>
+    </form>
 
-      <div class="footer-action">
-        <p>Already have an account? <router-link to="/login">Sign in here</router-link></p>
-      </div>
+    <div class="footer-action">
+      <p>Already have an account? <router-link to="/login">Sign in here</router-link></p>
     </div>
-  </div>
+  </AuthLayout>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import apiClient from '@/plugins/axios'; // Or wherever your configured Axios instance lives
+import apiClient from '@/plugins/axios';
+import { IonItem, IonInput, IonButton } from '@ionic/vue';
+import AuthLayout from '@/layouts/AuthLayout.vue';
 
 const router = useRouter();
 
@@ -82,14 +78,12 @@ const handleRegister = async (): Promise<void> => {
     isLoading.value = true;
     errorMessage.value = null;
 
-    // Calls your backend route: POST /api/users
     await apiClient.post('/api/users', {
       name: name.value.trim(),
       email: email.value.trim(),
       password: password.value,
     });
 
-    // On success, redirect to login page
     router.push('/login');
   } catch (error: any) {
     console.error('Registration failed', error);
@@ -101,105 +95,39 @@ const handleRegister = async (): Promise<void> => {
 </script>
 
 <style scoped>
-.register-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 80vh;
-  padding: 1rem;
-}
-
-.register-container {
-  width: 100%;
-  max-width: 400px;
-  padding: 2.5rem;
-  background: #1e1e1e;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-  color: #fff;
-}
-
-.header-section {
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.header-section h2 {
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-}
-
-.subtitle {
-  color: #aaa;
-  font-size: 0.95rem;
-}
-
-.input-group {
+.custom-item {
   margin-bottom: 1.25rem;
-}
-
-.input-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-  color: #ccc;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #333;
-  border-radius: 6px;
-  background-color: #121212;
-  color: #fff;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-.input-group input:focus {
-  border-color: #42b983;
-  outline: none;
-}
-
-.error-text {
-  color: #ff4d4d;
-  font-size: 0.85rem;
-  margin-bottom: 1rem;
-  text-align: center;
+  --background: transparent;
+  --border-color: #d1d5db;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
 }
 
 .submit-btn {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #42b983;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  margin-top: 1.5rem;
+  --border-radius: 8px;
+  font-weight: 600;
 }
 
-.submit-btn:hover:not(:disabled) {
-  background-color: #3aa876;
-}
-
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+.error-text {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
 .footer-action {
   margin-top: 1.5rem;
   text-align: center;
   font-size: 0.9rem;
-  color: #aaa;
+  color: #6b7280;
 }
 
 .footer-action a {
-  color: #42b983;
+  color: #3b82f6;
   text-decoration: none;
+  font-weight: 600;
 }
 
 .footer-action a:hover {

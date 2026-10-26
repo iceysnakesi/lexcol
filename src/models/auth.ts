@@ -14,7 +14,8 @@ export interface UserDto {
   id: string;
   email: string;
   username: string;
-  roles: string[];
+  role: string;               // Changed from string[] to string
+  membership_tier: string;    // Added membership_tier
 }
 
 export interface AuthResponse {

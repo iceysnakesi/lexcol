@@ -1,28 +1,23 @@
 <template>
-  <div id="home">
+  <ion-page>
     <PageHeader />
     
-    <main class="main-content">
-      <router-view />
-    </main>
+    <ion-content class="main-content">
+      <ion-router-outlet />
+    </ion-content>
     
     <PageFooter />
-  </div>
+  </ion-page>
 </template>
 
 <script setup lang="ts">
-import PageHeader from '@/components/PageHeader.vue'
-import PageFooter from '@/components/PageFooter.vue'
+import { IonPage, IonContent, IonRouterOutlet } from '@ionic/vue';
+import PageHeader from '@/components/PageHeader.vue';
+import PageFooter from '@/components/PageFooter.vue';
 </script>
 
 <style scoped>
-#home {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; 
-}
 .main-content {
-  flex: 1; 
-  padding: 2rem;
+  --background: #f4f6f8;
 }
 </style>

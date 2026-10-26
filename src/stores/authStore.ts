@@ -66,8 +66,8 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
   };
 }, {
-  // Selective persistence: keeps the token and user state safe on reload
+  // Use 'pick' instead of 'paths' for pinia-plugin-persistedstate
   persist: {
-    paths: ['accessToken', 'user'],
+    pick: ['accessToken', 'user', 'status'],
   },
 });

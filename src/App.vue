@@ -1,11 +1,9 @@
 <template>
-  <div class="app">
-    <router-view /> 
-  </div>
+  <ion-app>
+    <ion-router-outlet />
+  </ion-app>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-
-const router = useRouter();
+import { IonApp, IonRouterOutlet } from '@ionic/vue';
 </script>

@@ -1,53 +1,72 @@
 <template>
-  <header class="page-header">
-    <div class="logo">lexcol</div>
-    <nav>
-      <!-- Dashboard only shows when authenticated -->
-      <router-link v-if="authStore.isAuthenticated" to="/dashboard">Dashboard</router-link>
-      <router-link to="/about">About</router-link>
+  <ion-header>
+    <ion-toolbar class="custom-toolbar">
+      <div slot="start" class="logo">lexcol</div>
       
-      <!-- Dynamically swap Login/Logout based on auth state -->
-      <router-link v-if="!authStore.isAuthenticated" to="/login">Login</router-link>
-      <button v-else @click="handleLogout" class="logout-btn">Logout</button>
-    </nav>
-  </header>
+      <nav slot="end" class="nav-links">
+        <router-link v-if="authStore.isAuthenticated" to="/dashboard">Dashboard</router-link>
+        
+        <!-- Only show Admin link if user has the admin role -->
+        <router-link v-if="isAdmin" to="/admin" class="admin-link">Admin Panel</router-link>
+        
+        <router-link to="/about">About</router-link>
+        
+        <router-link v-if="!authStore.isAuthenticated" to="/login">Login</router-link>
+        <button v-else @click="handleLogout" class="logout-btn">Logout</button>
+      </nav>
+    </ion-toolbar>
+  </ion-header>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
+import { IonHeader, IonToolbar } from '@ionic/vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
 
+// Check if the authenticated user has the 'admin' role
+const isAdmin = computed(() => {
+  if (!authStore.isAuthenticated) return false;
+  const userRoles = authStore.user?.role || [];
+  return userRoles.includes('admin');
+});
+
 const handleLogout = (): void => {
   authStore.logout();
-  router.push('/About');
+  router.push('/about');
 };
 </script>
 
 <style scoped>
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
-  background-color: #1a1a1a;
-  color: white;
+.custom-toolbar {
+  --background: #1a1a1a;
+  --color: white;
+  padding: 0 1rem;
 }
 
-nav {
+.logo {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: white;
+  padding-left: 0.5rem;
+}
+
+.nav-links {
   display: flex;
   align-items: center;
   gap: 15px;
+  padding-right: 0.5rem;
 }
 
-nav a {
+.nav-links a {
   color: #42b983;
   text-decoration: none;
 }
 
-nav a.router-link-active {
+.nav-links a.router-link-active {
   font-weight: bold;
   text-decoration: underline;
 }
