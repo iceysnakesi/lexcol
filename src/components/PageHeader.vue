@@ -1,12 +1,13 @@
 <template>
-  <ion-header>
+  <ion-header class="desktop-header">
     <ion-toolbar class="custom-toolbar">
       <div slot="start" class="logo">lexcol</div>
       
       <nav slot="end" class="nav-links">
         <router-link v-if="authStore.isAuthenticated" to="/dashboard">Dashboard</router-link>
         
-        <!-- Only show Admin link if user has the admin role -->
+        <router-link to="/forum">Forum</router-link>
+
         <router-link v-if="isAdmin" to="/admin" class="admin-link">Admin Panel</router-link>
         
         <router-link to="/about">About</router-link>
@@ -27,7 +28,6 @@ import { IonHeader, IonToolbar } from '@ionic/vue';
 const router = useRouter();
 const authStore = useAuthStore();
 
-// Check if the authenticated user has the 'admin' role
 const isAdmin = computed(() => {
   if (!authStore.isAuthenticated) return false;
   const userRoles = authStore.user?.role || [];
@@ -41,6 +41,17 @@ const handleLogout = (): void => {
 </script>
 
 <style scoped>
+/* Responsive Display Rules */
+.desktop-header {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .desktop-header {
+    display: none;
+  }
+}
+
 .custom-toolbar {
   --background: #1a1a1a;
   --color: white;

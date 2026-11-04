@@ -3,11 +3,11 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-button @click="router.push('/')">
-            <ion-icon :icon="homeOutline" slot="icon-only"></ion-icon>
+          <ion-button @click="goHome">
+            <ion-icon :icon="arrowBackOutline" slot="icon-only"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title>{{ title }}</ion-title>
+        <div class="return_message">Back to dashboard</div>
       </ion-toolbar>
     </ion-header>
 
@@ -38,7 +38,7 @@ import {
   IonButton, 
   IonIcon 
 } from '@ionic/vue';
-import { homeOutline } from 'ionicons/icons';
+import { arrowBackOutline } from 'ionicons/icons';
 
 defineProps<{
   title: string;
@@ -46,6 +46,13 @@ defineProps<{
 }>();
 
 const router = useRouter();
+
+const goHome = (event: MouseEvent) => {
+  const buttonElement = event.currentTarget as HTMLElement;
+  buttonElement?.blur();
+
+  router.push('/');
+};
 </script>
 
 <style scoped>
@@ -81,5 +88,14 @@ const router = useRouter();
 .subtitle {
   color: #6b7280;
   font-size: 0.95rem;
+}
+
+.return_message {
+  display: flex;
+  align-items: left;
+  justify-content: left;
+  padding-left: 1rem;
+  font-size: 0.95rem;
+  width: 100%;
 }
 </style>

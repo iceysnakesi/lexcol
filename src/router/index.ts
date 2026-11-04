@@ -1,11 +1,15 @@
 import { createRouter, createWebHistory } from "@ionic/vue-router";
 import { useAuthStore } from "@/stores/authStore";
-import HomeLayout from "@/layouts/HomeLayout.vue";
-import Dashboard from "@/views/Dashboard.vue";
-import About from "@/views/About.vue";
-import LoginView from "@/views/LoginView.vue";
-import RegisterView from "@/views/Register.vue";
-import AdminView from "@/views/AdminPanel.vue";
+const HomeLayout = () => import("@/layouts/HomeLayout.vue");
+const Dashboard = () => import("@/views/Dashboard.vue");
+const About = () => import("@/views/About.vue");
+const LoginView = () => import("@/views/LoginView.vue");
+const RegisterView = () => import("@/views/Register.vue");
+const AdminView = () => import("@/views/AdminPanel.vue");
+const ChatBotView = () => import("@/views/ChatBot.vue");
+const ForumView = () => import("@/views/Forum.vue");
+const NewsView = () => import("@/views/News.vue");
+const VideoView = () => import("@/views/Videos.vue");
 
 const routes = [
   {
@@ -14,7 +18,7 @@ const routes = [
     children: [
       {
         path: "",
-        redirect: "/about"
+        redirect: "/news"
       },
       {
         path: "dashboard",
@@ -28,7 +32,27 @@ const routes = [
         component: About,
       },
       {
-        path: "/admin",
+        path: "chatbot",
+        name: "ChatBot",
+        component: ChatBotView,
+      },
+      {
+        path: "forum",
+        name: "Forum",
+        component: ForumView,
+      },
+      {
+        path: "news",
+        name: "News",
+        component: NewsView,
+      },
+      {
+        path: "videos",
+        name: "Videos",
+        component: VideoView,
+      },
+      {
+        path: "admin",
         name: "Admin",
         component: AdminView,
         meta: { requiresAdmin: true }

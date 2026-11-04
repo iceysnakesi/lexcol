@@ -78,7 +78,7 @@ const users = ref<UserDto[]>([]);
 
 const fetchUsers = async () => {
   try {
-    const response = await apiClient.get('/api/users');
+    const response = await apiClient.get('/users');
     users.value = response.data.data || response.data;
   } catch (error) {
     console.error('Failed to fetch users', error);
@@ -87,7 +87,7 @@ const fetchUsers = async () => {
 
 const promoteToAdmin = async (id: string) => {
   try {
-    await apiClient.patch(`/api/users/${id}/role`, { role: 'admin' });
+    await apiClient.patch(`/users/${id}/role`, { role: 'admin' });
     await fetchUsers();
     console.log('Role updated successfully');
   } catch (error) {
@@ -97,7 +97,7 @@ const promoteToAdmin = async (id: string) => {
 
 const demoteToUser = async (id: string) => {
   try {
-    await apiClient.patch(`/api/users/${id}/role`, { role: 'user' });
+    await apiClient.patch(`/users/${id}/role`, { role: 'user' });
     await fetchUsers();
     console.log('Role updated successfully');
   } catch (error) {
@@ -108,7 +108,7 @@ const demoteToUser = async (id: string) => {
 const updateUserTier = async (user: UserDto, event: CustomEvent<{ value: string }>) => {
   const newTier = event.detail.value;
   try {
-    await apiClient.patch(`/api/users/${user.id}/role`, {
+    await apiClient.patch(`/users/${user.id}/role`, {
       role: user.role,              
       membership_tier: newTier      
     });

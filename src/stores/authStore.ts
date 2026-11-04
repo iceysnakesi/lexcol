@@ -4,9 +4,13 @@ import { AuthStatus, LoginRequest, UserDto, AuthResponse } from '@/models/auth';
 import { apiClient } from '@/services/apiClient';
 import type { AxiosResponse } from 'axios';
 
+export interface AuthUser extends Omit<UserDto, 'role'> {
+  role: string[];
+}
+
 export const useAuthStore = defineStore('auth', () => {
   // State
-  const user = ref<UserDto | null>(null);
+  const user = ref<AuthUser | null>(null);
   const accessToken = ref<string | null>(localStorage.getItem('access_token'));
   const status = ref<AuthStatus>(AuthStatus.IDLE);
   const errorMessage = ref<string | null>(null);
@@ -26,10 +30,10 @@ export const useAuthStore = defineStore('auth', () => {
     errorMessage.value = null;
 
     try {
-      const response: AxiosResponse<AuthResponse> = await apiClient.post('/api/auth/login', credentials);
+      const response: AxiosResponse<AuthResponse> = await apiClient.post('/auth/login', credentials);
 
       accessToken.value = response.data.accessToken;
-      user.value = response.data.user;
+      user.value = response.data.user as unknown as AuthUser;
       status.value = AuthStatus.AUTHENTICATED;
       lastFetchedAt.value = Date.now();
 
@@ -44,7 +48,7 @@ export const useAuthStore = defineStore('auth', () => {
       throw error;
     }
   }
-  
+
   function logout(): void {
     user.value = null;
     accessToken.value = null;
@@ -66,7 +70,6 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
   };
 }, {
-  // Use 'pick' instead of 'paths' for pinia-plugin-persistedstate
   persist: {
     pick: ['accessToken', 'user', 'status'],
   },
