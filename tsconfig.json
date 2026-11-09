@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "strict": true,
-    "types": ["node"],
-    "baseUrl": "./",
-    "moduleResolution": "node",
+    "types": [
+      "node"
+    ],
+    "moduleResolution": "bundler",
+    "ignoreDeprecations": "6.0",
   },
   "files": [],
   "references": [

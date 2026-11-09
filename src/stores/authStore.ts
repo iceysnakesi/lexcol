@@ -1,50 +1,43 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { AuthStatus, LoginRequest, UserDto, AuthResponse } from '@/models/auth';
-import { apiClient } from '@/services/apiClient';
-import type { AxiosResponse } from 'axios';
-
-export interface AuthUser extends Omit<UserDto, 'role'> {
-  role: string[];
-}
+import { AuthStatus, type LoginRequest, type UserDto } from '@/models/auth';
+import { login as loginRequest } from '@/services/authService';
 
 export const useAuthStore = defineStore('auth', () => {
-  // State
-  const user = ref<AuthUser | null>(null);
+  const user = ref<UserDto | null>(null);
   const accessToken = ref<string | null>(localStorage.getItem('access_token'));
   const status = ref<AuthStatus>(AuthStatus.IDLE);
   const errorMessage = ref<string | null>(null);
   const lastFetchedAt = ref<number | null>(null);
 
-  // Getters / Computed
-  const isAuthenticated = computed(() => status.value === AuthStatus.AUTHENTICATED && !!accessToken.value);
+  const isAuthenticated = computed(
+    () => status.value === AuthStatus.AUTHENTICATED && !!accessToken.value
+  );
   const isLoading = computed(() => status.value === AuthStatus.LOADING);
   const isCached = computed(() => {
     if (!lastFetchedAt.value) return false;
-    return Date.now() - lastFetchedAt.value < 300000; // 5 min cache
+    return Date.now() - lastFetchedAt.value < 300000;
   });
 
-  // Actions
   async function login(credentials: LoginRequest): Promise<void> {
     status.value = AuthStatus.LOADING;
     errorMessage.value = null;
 
     try {
-      const response: AxiosResponse<AuthResponse> = await apiClient.post('/auth/login', credentials);
+      const response = await loginRequest(credentials);
 
-      accessToken.value = response.data.accessToken;
-      user.value = response.data.user as unknown as AuthUser;
+      accessToken.value = response.accessToken;
+      user.value = response.user;
       status.value = AuthStatus.AUTHENTICATED;
       lastFetchedAt.value = Date.now();
 
-      localStorage.setItem('access_token', response.data.accessToken);
+      localStorage.setItem('access_token', response.accessToken);
     } catch (error: unknown) {
       status.value = AuthStatus.ERROR;
-      if (error instanceof Error) {
-        errorMessage.value = error.message;
-      } else {
-        errorMessage.value = 'An unexpected authentication error occurred.';
-      }
+      errorMessage.value =
+        error instanceof Error
+          ? error.message
+          : 'An unexpected authentication error occurred.';
       throw error;
     }
   }
@@ -58,6 +51,19 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('access_token');
   }
 
+  function updateUser(updatedData: Partial<UserDto>): void {
+    if (!user.value) return;
+    user.value = { ...user.value, ...updatedData };
+  }
+
+  function refreshSession(newToken: string, updatedUser: UserDto): void {
+    accessToken.value = newToken;
+    user.value = updatedUser;
+    status.value = AuthStatus.AUTHENTICATED;
+    lastFetchedAt.value = Date.now();
+    localStorage.setItem('access_token', newToken);
+  }
+
   return {
     user,
     accessToken,
@@ -68,9 +74,9 @@ export const useAuthStore = defineStore('auth', () => {
     isCached,
     login,
     logout,
+    updateUser,
+    refreshSession
   };
 }, {
-  persist: {
-    pick: ['accessToken', 'user', 'status'],
-  },
+  persist: { pick: ['accessToken', 'user', 'status'] },
 });

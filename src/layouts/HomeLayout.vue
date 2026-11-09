@@ -9,7 +9,7 @@
       <MobileHeader />
       
       <div class="outlet-container">
-        <ion-router-outlet />
+        <ion-router-outlet :animated="false"/>
       </div>
       <PageFooter />
       <MobileNavBar />

@@ -7,15 +7,16 @@ export enum AuthStatus {
 
 export interface LoginRequest {
   email: string;
-  passwordHash: string;
+  password: string;
 }
 
 export interface UserDto {
   id: string;
+  name: string;
   email: string;
-  username: string;
-  role: string;               // Changed from string[] to string
-  membership_tier: string;    // Added membership_tier
+  role: string;
+  membership_tier: string;
+  avatar_url: string | null;
 }
 
 export interface AuthResponse {
@@ -26,6 +27,6 @@ export interface AuthResponse {
 
 export interface ApiErrorResponse {
   message: string;
-  statusCode: number;
-  errorCode: string;
+  statusCode?: number;
+  errorCode?: string;
 }

@@ -1,7 +1,7 @@
 <template>
   <ion-footer class="desktop-footer">
     <ion-toolbar class="footer-toolbar">
-      <p class="footer-text">&copy; {{ currentYear }} lexcol. All rights reserved.</p>
+      <p class="footer-text">lexcol - 2026.</p>
     </ion-toolbar>
   </ion-footer>
 </template>

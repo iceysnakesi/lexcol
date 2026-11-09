@@ -11,18 +11,18 @@
     <!-- Left / Top: Avatar & User Info -->
     <div class="user-info-section">
       <ion-avatar class="user-avatar">
-        <img v-if="user.avatarUrl" :src="user.avatarUrl" alt="Avatar" />
+        <img v-if="user.avatar_url" :src="user.avatar_url" alt="Avatar" />
         <div v-else class="avatar-placeholder">
-          {{ (user.username || user.email || 'U').charAt(0).toUpperCase() }}
+          {{ (user.name || user.email || 'U').charAt(0).toUpperCase() }}
         </div>
       </ion-avatar>
 
       <div class="user-details">
-        <h3><strong>{{ user.username || 'Unnamed User' }}</strong></h3>
+        <h3><strong>{{ user.name || 'Unnamed User' }}</strong></h3>
         <p class="user-email">{{ user.email || 'No email provided' }}</p>
         <p class="user-meta">
           Role: <span class="badge">{{ user.role || 'user' }}</span> | 
-          Tier: <span class="badge">{{ user.membership_tier || 'standard' }}</span>
+          Tier: <span class="badge">{{ user.membership_tier || 'free' }}</span>
         </p>
       </div>
     </div>
@@ -46,7 +46,7 @@
       </ion-button>
 
       <ion-select 
-  :value="user.membership_tier || 'standard'" 
+  :value="user.membership_tier || 'free'" 
   @ionChange="updateUserTier(user, $event)"
   interface="popover"
   placeholder=""
@@ -67,8 +67,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { apiClient } from '@/services/apiClient';
-import { 
+import { getAllUsers, updateUserRole } from '@/services/userService';
+import {
   IonPage, IonContent, IonButton, IonAvatar,
   IonSelect, IonSelectOption
 } from '@ionic/vue';
@@ -78,8 +78,8 @@ const users = ref<UserDto[]>([]);
 
 const fetchUsers = async () => {
   try {
-    const response = await apiClient.get('/users');
-    users.value = response.data.data || response.data;
+    const response = await getAllUsers();
+    users.value = response.data;
   } catch (error) {
     console.error('Failed to fetch users', error);
   }
@@ -87,9 +87,8 @@ const fetchUsers = async () => {
 
 const promoteToAdmin = async (id: string) => {
   try {
-    await apiClient.patch(`/users/${id}/role`, { role: 'admin' });
+    await updateUserRole(id, { role: 'admin' });
     await fetchUsers();
-    console.log('Role updated successfully');
   } catch (error) {
     console.error('Failed to update role', error);
   }
@@ -97,9 +96,8 @@ const promoteToAdmin = async (id: string) => {
 
 const demoteToUser = async (id: string) => {
   try {
-    await apiClient.patch(`/users/${id}/role`, { role: 'user' });
+    await updateUserRole(id, { role: 'user' });
     await fetchUsers();
-    console.log('Role updated successfully');
   } catch (error) {
     console.error('Failed to demote user', error);
   }
@@ -108,12 +106,8 @@ const demoteToUser = async (id: string) => {
 const updateUserTier = async (user: UserDto, event: CustomEvent<{ value: string }>) => {
   const newTier = event.detail.value;
   try {
-    await apiClient.patch(`/users/${user.id}/role`, {
-      role: user.role,              
-      membership_tier: newTier      
-    });
+    await updateUserRole(user.id, { membership_tier: newTier });
     user.membership_tier = newTier;
-    console.log('Tier updated successfully');
   } catch (error) {
     console.error('Failed to update tier', error);
   }

@@ -11,7 +11,7 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content class="ion-padding">
+        <ion-content class="ion-padding" :scroll-assist="false">
       <div class="auth-wrapper">
         <div class="auth-container">
           <div class="header-section" v-if="title">
@@ -59,14 +59,22 @@ const goHome = (event: MouseEvent) => {
 .auth-wrapper {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 100%;
-  padding: 1rem;
+  padding: max(12vh, 3rem) 1rem 2rem;
+}
+
+@media (max-width: 767px) {
+  .auth-wrapper {
+    min-height: auto;
+    padding: 2rem 1rem;
+  }
 }
 
 .auth-container {
   width: 100%;
   max-width: 400px;
+  min-width: 0;
   background: white;
   padding: 2.5rem 2rem;
   border-radius: 12px;

@@ -65,9 +65,9 @@ const handleLogin = async (): Promise<void> => {
     authStore.errorMessage = null;
     await authStore.login({
       email: email.value.trim(),
-      passwordHash: password.value,
+      password: password.value,
     });
-    const redirectPath = (route.query.redirect as string) || '/dashboard';
+    const redirectPath = (route.query.redirect as string) || '/news';
     router.push(redirectPath);
   } catch (error) {
     console.error('Login failed', error);

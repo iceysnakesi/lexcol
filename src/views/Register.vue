@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import apiClient from '@/plugins/axios';
+import { createUser } from '@/services/userService';
 import { IonItem, IonInput, IonButton } from '@ionic/vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
 
@@ -78,7 +78,7 @@ const handleRegister = async (): Promise<void> => {
     isLoading.value = true;
     errorMessage.value = null;
 
-    await apiClient.post('/api/users', {
+    await createUser({
       name: name.value.trim(),
       email: email.value.trim(),
       password: password.value,
@@ -87,7 +87,9 @@ const handleRegister = async (): Promise<void> => {
     router.push('/login');
   } catch (error: any) {
     console.error('Registration failed', error);
-    errorMessage.value = error.response?.data?.message || 'Failed to create account. Please try again.';
+    errorMessage.value =
+      error.response?.data?.message ||
+      'Failed to create account. Please try again.';
   } finally {
     isLoading.value = false;
   }

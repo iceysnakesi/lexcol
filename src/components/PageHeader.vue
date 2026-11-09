@@ -2,18 +2,29 @@
   <ion-header class="desktop-header">
     <ion-toolbar class="custom-toolbar">
       <div slot="start" class="logo">lexcol</div>
-      
-      <nav slot="end" class="nav-links">
-        <router-link v-if="authStore.isAuthenticated" to="/dashboard">Dashboard</router-link>
-        
-        <router-link to="/forum">Forum</router-link>
 
-        <router-link v-if="isAdmin" to="/admin" class="admin-link">Admin Panel</router-link>
-        
+      <nav slot="end" class="nav-links">
+        <router-link to="/forum">Forum</router-link>
+        <router-link to="/chatbot">Chat</router-link>
+        <router-link to="/videos">Videos</router-link>
+        <router-link to="/news">News</router-link>
         <router-link to="/about">About</router-link>
-        
-        <router-link v-if="!authStore.isAuthenticated" to="/login">Login</router-link>
-        <button v-else @click="handleLogout" class="logout-btn">Logout</button>
+
+        <router-link v-if="isAdmin" to="/admin" class="admin-link">
+          Admin Panel
+        </router-link>
+
+        <router-link
+          v-if="authStore.isAuthenticated"
+          to="/your_profile"
+        >My Profile</router-link>
+
+        <router-link v-if="!authStore.isAuthenticated" to="/login">
+          Login
+        </router-link>
+        <button v-else @click="handleLogout" class="logout-btn">
+          Logout
+        </button>
       </nav>
     </ion-toolbar>
   </ion-header>
@@ -21,27 +32,20 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore';
 import { IonHeader, IonToolbar } from '@ionic/vue';
 
-const router = useRouter();
 const authStore = useAuthStore();
 
-const isAdmin = computed(() => {
-  if (!authStore.isAuthenticated) return false;
-  const userRoles = authStore.user?.role || [];
-  return userRoles.includes('admin');
-});
+const isAdmin = computed(() => authStore.user?.role === 'admin');
 
 const handleLogout = (): void => {
   authStore.logout();
-  router.push('/about');
+  window.location.href = '/about';
 };
 </script>
 
 <style scoped>
-/* Responsive Display Rules */
 .desktop-header {
   display: block;
 }
@@ -68,7 +72,7 @@ const handleLogout = (): void => {
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 24px;
   padding-right: 0.5rem;
 }
 
@@ -79,7 +83,6 @@ const handleLogout = (): void => {
 
 .nav-links a.router-link-active {
   font-weight: bold;
-  text-decoration: underline;
 }
 
 .logout-btn {
@@ -93,6 +96,6 @@ const handleLogout = (): void => {
 }
 
 .logout-btn:hover {
-  text-decoration: underline;
+  color: #ff7070;
 }
 </style>

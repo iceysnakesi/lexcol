@@ -1,16 +1,16 @@
 <template>
   <div class="forum-header-controls">
     <div class="search-wrapper">
-      <ion-searchbar 
+          <ion-searchbar 
         :model-value="modelValue"
         @ionInput="handleInput"
-        placeholder="Search discussions..." 
+        :placeholder="placeholder"
         :debounce="400"
       ></ion-searchbar>
     </div>
     
-    <!-- Filter Button -->
-    <div class="filter-btn-wrapper">
+        <!-- Filter Button -->
+    <div v-if="!hideFilter" class="filter-btn-wrapper">
       <ion-button
         fill="clear"
         id="filter-trigger"
@@ -20,10 +20,22 @@
         <ion-icon slot="icon-only" :icon="optionsOutline" />
       </ion-button>
     </div>
+
+    <!-- Desktop-Only Post Management Button -->
+<div v-if="isAdmin" class="desktop-admin-action">
+      <ion-button 
+      fill="clear" 
+      @click="goToAdminRoute" 
+      class="desktop-manage-btn"
+    >
+      <ion-icon slot="start" :icon="createOutline"></ion-icon>
+      {{ adminButtonLabel }}
+    </ion-button>
+</div>
   </div>
 
-  <!-- Filter Popover Wrapper -->
-  <div class="filter-popover-wrapper">
+    <!-- Filter Popover Wrapper -->
+  <div v-if="!hideFilter" class="filter-popover-wrapper">
     <ion-popover
       trigger="filter-trigger"
       trigger-action="click"
@@ -36,8 +48,8 @@
           <ion-item button @click="selectFilter('newest')">
             <ion-label>Newest First</ion-label>
           </ion-item>
-          <ion-item button @click="selectFilter('popular')">
-            <ion-label>Most Popular</ion-label>
+          <ion-item button @click="selectFilter('oldest')">
+            <ion-label>Oldest First</ion-label>
           </ion-item>
         </ion-list>
       </ion-content>
@@ -46,23 +58,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { ref, computed } from 'vue';
 import { 
   IonSearchbar, IonButton, IonIcon, IonPopover, 
   IonContent, IonList, IonListHeader, IonItem, IonLabel 
 } from '@ionic/vue';
-import { optionsOutline } from 'ionicons/icons';
+import { optionsOutline, createOutline } from 'ionicons/icons';
+import { useAuthStore } from '@/stores/authStore';
 
-defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: string;
-}>();
+  placeholder?: string;
+  hideFilter?: boolean;
+  adminButtonLabel?: string;
+  adminButtonRoute?: string;
+}>(), {
+  placeholder: 'Search discussions...',
+  hideFilter: false,
+  adminButtonLabel: 'Post Management',
+  adminButtonRoute: '/postmanagement',
+});
+
+const router = useRouter();
+
+const goToAdminRoute = (event: MouseEvent) => {
+  const target = event.currentTarget as HTMLElement;
+  if (target) {
+    target.blur();
+  }
+  router.push(props.adminButtonRoute);
+};
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void;
   (e: 'filter', filterType: string): void;
 }>();
 
+const authStore = useAuthStore();
 const isFilterOpen = ref(false);
+
+const isAdmin = computed(() => authStore.user?.role === 'admin');
 
 const handleInput = (event: CustomEvent) => {
   const value = (event.detail.value as string) || '';
@@ -96,7 +132,6 @@ const selectFilter = (filterType: string) => {
 .filter-btn-wrapper {
   display: flex;
   align-items: center;
-  margin-right: 8px;
 }
 
 .filter-btn {
@@ -105,6 +140,39 @@ const selectFilter = (filterType: string) => {
   height: 42px;
   width: 42px;
   margin: 0;
+}
+
+/* Hidden by default on mobile */
+.desktop-admin-action {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktop-admin-action {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  /* Clean borderless button matching the filter aesthetic */
+  .desktop-manage-btn {
+    --background: #ffffff;
+    --color: #4b5563;
+    --border-radius: 8px;
+    height: 42px;
+    font-weight: 500;
+    text-transform: none;
+    margin: 0;
+    padding: 0 14px;
+    box-shadow: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .desktop-manage-btn:hover {
+      --background: rgba(0, 0, 0, 0.04);
+      --color: #1f2937;
+    }
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {
