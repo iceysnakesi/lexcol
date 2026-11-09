@@ -24,12 +24,6 @@ export interface NewsListResponse {
     news: NewsItem[];
 }
 
-export interface MotdMessage {
-    id: number;
-    message: string;
-    created_at: string;
-}
-
 export const newsService = {
     async getNews(page: number, limit: number, search = ''): Promise<NewsListResponse> {
         const { data } = await apiClient.get<NewsListResponse>('/news', {
@@ -66,16 +60,6 @@ export const newsService = {
 
     async deleteNews(id: number) {
         const { data } = await apiClient.delete(`/news/${id}`);
-        return data;
-    },
-
-    async getMotd(): Promise<MotdMessage | null> {
-        const { data } = await apiClient.get<MotdMessage | null>('/news/motd');
-        return data;
-    },
-
-    async setMotd(message: string): Promise<MotdMessage> {
-        const { data } = await apiClient.post<MotdMessage>('/news/motd', { message });
         return data;
     },
 };

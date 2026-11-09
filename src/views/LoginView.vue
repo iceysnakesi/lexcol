@@ -25,6 +25,10 @@
         ></ion-input>
       </ion-item>
 
+            <div class="forgot-password-wrapper">
+        <router-link to="/forgot-password" class="forgot-link">Forgot Password?</router-link>
+      </div>
+
       <p class="error-text" v-if="authStore.errorMessage">
         {{ authStore.errorMessage }}
       </p>
@@ -113,5 +117,20 @@ const handleLogin = async (): Promise<void> => {
 
 .footer-action a:hover {
   text-decoration: underline;
+}
+
+.forgot-password-wrapper {
+  text-align: right;
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+}
+.forgot-link {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-decoration: none;
+}
+.forgot-link:hover {
+  text-decoration: underline;
+  color: #3b82f6;
 }
 </style>

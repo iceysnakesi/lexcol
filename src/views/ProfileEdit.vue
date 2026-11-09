@@ -83,7 +83,6 @@
                   placeholder="Select plan"
                 >
                   <ion-select-option value="pro">Pro</ion-select-option>
-                  <ion-select-option value="enterprise">Enterprise</ion-select-option>
                 </ion-select>
               </ion-item>
             </div>
@@ -162,7 +161,6 @@ const membershipSuccess = ref('');
 const tierLabel = computed(() => {
   const t = currentTier.value;
   if (t === 'pro') return 'Pro';
-  if (t === 'enterprise') return 'Enterprise';
   return 'Free';
 });
 
@@ -172,9 +170,6 @@ const membershipMessage = computed(() => {
   const t = currentTier.value;
   if (t === 'pro') {
     return 'You have full access to all videos and Pro-only features.';
-  }
-  if (t === 'enterprise') {
-    return 'You have premium access to every feature, including Enterprise-only content.';
   }
   return 'You are on the Free plan. Upgrade to Pro to unlock full videos and premium features.';
 });
@@ -274,7 +269,7 @@ async function upgradeToPro() {
 
 async function applyTierChange() {
   if (newTier.value === currentTier.value) return;
-  await performTierChange(newTier.value as 'pro' | 'enterprise');
+  await performTierChange(newTier.value as 'pro');
 }
 
 async function cancelSubscription() {
@@ -284,7 +279,7 @@ async function cancelSubscription() {
   await performTierChange('free');
 }
 
-async function performTierChange(tier: 'free' | 'pro' | 'enterprise') {
+async function performTierChange(tier: 'free' | 'pro') {
   changingTier.value = true;
   membershipError.value = '';
   membershipSuccess.value = '';
@@ -471,11 +466,6 @@ async function performTierChange(tier: 'free' | 'pro' | 'enterprise') {
 .tier-badge.tier-pro {
   background: rgba(66, 185, 131, 0.15);
   color: #059669;
-}
-
-.tier-badge.tier-enterprise {
-  background: rgba(168, 85, 247, 0.15);
-  color: #7c3aed;
 }
 
 .membership-message {

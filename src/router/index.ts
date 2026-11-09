@@ -17,6 +17,8 @@ const EditProfileView = () => import("@/views/ProfileEdit.vue");
 const EditPostView = () => import("@/views/EditPost.vue");
 const NewsDetailView = () => import("@/views/NewsDetail.vue");
 const CreateNewsView = () => import("@/views/CreateNews.vue");
+const ForgotPasswordView = () => import("@/views/ForgotPassword.vue");
+const ResetPasswordView = () => import("@/views/ResetPassword.vue");
 
 const routes = [
   {
@@ -37,11 +39,6 @@ const routes = [
         path: "about",
         name: "About",
         component: About,
-      },
-      {
-        path: "chatbot",
-        name: "ChatBot",
-        component: ChatBotView,
       },
       {
         path: "forum",
@@ -106,6 +103,11 @@ const routes = [
     ],
   },
   {
+    path: "/chatbot",
+    name: "ChatBot",
+    component: ChatBotView,
+  },
+  {
     path: "/login",
     name: "Login",
     component: LoginView,
@@ -114,6 +116,16 @@ const routes = [
     path: "/register",
     name: "Register",
     component: RegisterView,
+  },
+  {
+    path: "/forgot-password",
+    name: "ForgotPassword",
+    component: ForgotPasswordView,
+  },
+  {
+    path: "/reset-password",
+    name: "ResetPassword",
+    component: ResetPasswordView,
   },
 ];
 

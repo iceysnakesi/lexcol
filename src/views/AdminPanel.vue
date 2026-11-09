@@ -54,7 +54,6 @@
 >
   <ion-select-option value="free">Standard</ion-select-option>
   <ion-select-option value="pro">Pro</ion-select-option>
-  <ion-select-option value="enterprise">Enterprise</ion-select-option>
 </ion-select>
     </div>
 
