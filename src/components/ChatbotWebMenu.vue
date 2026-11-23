@@ -35,12 +35,20 @@
             button
             @click="handleSelect(chat.id)"
           >
-            <ion-icon slot="start" :icon="chatbubblesOutline" />
+            <ion-icon slot="start" :icon="chatbubblesOutline"></ion-icon>
             <ion-label>
               <h3>{{ chat.title }}</h3>
-              <!-- Change this line -->
               <p>{{ chat.last_message || 'No messages yet' }}</p>
             </ion-label>
+            
+            <ion-button 
+              slot="end" 
+              fill="clear" 
+              color="danger" 
+              @click.stop="emit('delete', chat.id)"
+            >
+              <ion-icon slot="icon-only" :icon="trashOutline" />
+            </ion-button>
           </ion-item>
 
         <ion-item-divider />
@@ -60,7 +68,7 @@ import {
   IonListHeader, IonItem, IonItemDivider, IonLabel, IonIcon, IonButton,
   menuController,
 } from '@ionic/vue';
-import { menuOutline, addOutline, chatbubblesOutline } from 'ionicons/icons';
+import { menuOutline, addOutline, chatbubblesOutline, trashOutline } from 'ionicons/icons';
 
 // Match the service's interface
 interface SavedChat {
@@ -74,7 +82,8 @@ defineProps<{ savedChats: SavedChat[] }>();
 
 const emit = defineEmits<{
   (e: 'new'): void;
-  (e: 'select', id: number): void; // Changed from string to number
+  (e: 'select', id: number): void;
+  (e: 'delete', id: number): void;
 }>();
 
 const MENU_ID = 'chat-web-menu';

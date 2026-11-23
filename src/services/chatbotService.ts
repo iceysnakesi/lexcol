@@ -1,10 +1,5 @@
 import { apiClient } from './apiClient';
 
-export interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
 export interface SavedChat {
   id: number;
   title: string;
@@ -12,9 +7,23 @@ export interface SavedChat {
   updated_at: string;
 }
 
+export interface ChatMessageResponse {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
 export const chatbotService = {
-  async sendMessage(message: string, chatId: number | null): Promise<{ reply: string; chatId: number }> {
-    const { data } = await apiClient.post('/chatbot/message', { message, chatId });
+  async deleteChat(chatId: number): Promise<void> {
+    await apiClient.delete(`/chatbot/chats/${chatId}`);
+  },
+
+  async sendMessage(message: string, chatId: number | null, isEdit = false) {
+    const { data } = await apiClient.post('/chatbot/message', { message, chatId, isEdit });
+    return data;
+  },
+
+  async regenerate(chatId: number) {
+    const { data } = await apiClient.post('/chatbot/regenerate', { chatId });
     return data;
   },
 
@@ -23,8 +32,8 @@ export const chatbotService = {
     return data.chats;
   },
 
-  async getChatMessages(chatId: number): Promise<ChatMessage[]> {
+  async getChatMessages(chatId: number): Promise<ChatMessageResponse[]> {
     const { data } = await apiClient.get(`/chatbot/chats/${chatId}`);
     return data.messages;
-  }
+  },
 };

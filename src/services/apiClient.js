@@ -1,7 +1,7 @@
 import axios from 'axios';
 export const apiClient = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
-    timeout: 10000,
+    timeout: 60000, // 60 seconds — enough time for complex AI responses
 });
 // Request Interceptor: Attach Token & Correlation ID
 apiClient.interceptors.request.use((config) => {

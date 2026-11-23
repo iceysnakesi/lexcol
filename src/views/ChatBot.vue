@@ -4,10 +4,11 @@
     <PageHeader />
 
     <!-- Web-only chat menu (top-left, below header) -->
-    <ChatbotWebMenu
+        <ChatbotWebMenu
       :saved-chats="savedChats"
       @new="newChat"
       @select="selectChat"
+      @delete="deleteChat"
     />
 
     <!-- Mobile slide menu -->
@@ -76,16 +77,58 @@
             <p>Ask me anything about Lexcol.</p>
           </div>
 
-          <div v-else class="message-list">
+                    <div v-else class="message-list">
             <div
-              v-for="msg in messages"
+              v-for="(msg, index) in messages"
               :key="msg.id"
               :class="['message-row', msg.role]"
             >
-              <div class="message-bubble">{{ msg.content }}</div>
+              <!-- INLINE EDIT MODE (Only shows for the message being edited) -->
+              <template v-if="editingMessageId === msg.id">
+                <div class="inline-edit-wrapper">
+                  <ion-textarea
+  v-model="editDraftContent"
+  :auto-grow="false"
+  :rows="1"
+  class="inline-edit-textarea"
+/>
+                  <div class="inline-edit-actions">
+                    <ion-button size="small" fill="clear" @click="cancelEdit">Cancel</ion-button>
+                    <ion-button size="small" color="dark" @click="saveEdit(index)">Save</ion-button>
+                  </div>
+                </div>
+              </template>
+
+              <!-- NORMAL MODE -->
+              <template v-else>
+                <!-- Edit Button (Only on the last user message) -->
+                <ion-button
+                  v-if="msg.role === 'user' && index === messages.map(m => m.role).lastIndexOf('user') && !sending"
+                  fill="clear"
+                  size="small"
+                  class="msg-action-btn"
+                  @click="startEdit(msg)"
+                >
+                  <ion-icon :icon="pencilOutline" />
+                </ion-button>
+
+                <div class="message-bubble">{{ msg.content }}</div>
+
+                <!-- Regenerate Button -->
+                <ion-button
+                  v-if="msg.role === 'assistant' && index === messages.length - 1 && !sending"
+                  fill="clear"
+                  size="small"
+                  class="msg-action-btn"
+                  @click="regenerateAnswer"
+                >
+                  <ion-icon :icon="refreshOutline" />
+                </ion-button>
+              </template>
             </div>
 
-            <div v-if="sending" class="message-row assistant">
+            <!-- Typing Indicator -->
+            <div v-if="sending && editingMessageId === null" class="message-row assistant">
               <div class="message-bubble typing">
                 <span></span><span></span><span></span>
               </div>
@@ -126,13 +169,10 @@ import {
   IonList, IonListHeader, IonItem, IonItemDivider, IonLabel, IonIcon,
   IonButtons, IonMenuButton, IonTextarea, IonButton, menuController,
 } from '@ionic/vue';
-import {
-  chatbubblesOutline, addOutline, arrowBackOutline, sendOutline,
-} from 'ionicons/icons';
+import { chatbubblesOutline, addOutline, arrowBackOutline, sendOutline, pencilOutline, refreshOutline, trashOutline } from 'ionicons/icons';
 import PageHeader from '@/components/PageHeader.vue';
 import ChatbotWebMenu from '@/components/ChatbotWebMenu.vue';
-import { chatbotService, type SavedChat } from '@/services/chatbotService';
-import { onIonViewWillEnter } from '@ionic/vue'; // Make sure this is imported
+import { chatbotService, type SavedChat, type ChatMessageResponse } from '@/services/chatbotService';import { onIonViewWillEnter } from '@ionic/vue';
 
 
 interface ChatMessage {
@@ -149,6 +189,8 @@ const sending = ref(false);
 const contentRef = ref<HTMLIonContentElement>();
 const savedChats = ref<SavedChat[]>([]);
 const currentChatId = ref<number | null>(null);
+  const editingMessageId = ref<string | null>(null);
+const editDraftContent = ref('');
 
 let msgCounter = 0;
 function nextId(): string {
@@ -163,10 +205,55 @@ onIonViewWillEnter(async () => {
   }
 });
 
+function startEdit(msg: any) {
+  if (sending.value) return;
+  editingMessageId.value = msg.id;
+  editDraftContent.value = msg.content;
+}
+
+function cancelEdit() {
+  editingMessageId.value = null;
+  editDraftContent.value = '';
+}
+
+async function saveEdit(index: number) {
+  const text = editDraftContent.value.trim();
+  if (!text) return;
+
+  // Update the text in the UI immediately
+  const msgToEdit = messages.value[index];
+  if (msgToEdit) {
+    msgToEdit.content = text;
+  }
+  
+  // Remove any AI responses that came after this message (since the context changed)
+  messages.value = messages.value.slice(0, index + 1);
+  
+  cancelEdit();
+  sending.value = true;
+  await scrollToBottom();
+
+  try {
+    // Send to backend with isEdit: true
+    const response = await chatbotService.sendMessage(text, currentChatId.value, true);
+    messages.value.push({ id: nextId(), role: 'assistant', content: response.reply });
+  } catch (error: any) {
+    messages.value.push({
+      id: nextId(),
+      role: 'assistant',
+      content: error.response?.data?.error || 'Sorry, an error occurred.',
+    });
+  } finally {
+    sending.value = false;
+    await scrollToBottom();
+  }
+}
+
 async function sendMessage() {
   const text = input.value.trim();
   if (!text || sending.value) return;
 
+  // Add the new (or edited) message to the UI
   messages.value.push({ id: nextId(), role: 'user', content: text });
   input.value = '';
   sending.value = true;
@@ -174,25 +261,45 @@ async function sendMessage() {
 
   try {
     const response = await chatbotService.sendMessage(text, currentChatId.value);
-
-    // If it was a new chat, the backend returns the new chatId
+    
     if (!currentChatId.value) {
       currentChatId.value = response.chatId;
-      // Refresh the saved chats list so it appears in the menu immediately
       savedChats.value = await chatbotService.getChats();
     }
 
-    messages.value.push({
-      id: nextId(),
-      role: 'assistant',
-      content: response.reply,
-    });
+    messages.value.push({ id: nextId(), role: 'assistant', content: response.reply });
   } catch (error: any) {
     console.error('Chat error:', error);
     messages.value.push({
       id: nextId(),
       role: 'assistant',
       content: error.response?.data?.error || 'Sorry, I encountered an error. Please try again.',
+    });
+  } finally {
+    sending.value = false;
+    await scrollToBottom();
+  }
+}
+
+async function regenerateAnswer() {
+  if (sending.value || !currentChatId.value) return;
+
+  // Remove the last AI message from the UI so we can show the typing indicator
+  if (messages.value[messages.value.length - 1]?.role === 'assistant') {
+    messages.value.pop();
+  }
+
+  sending.value = true;
+  await scrollToBottom();
+
+  try {
+    const response = await chatbotService.regenerate(currentChatId.value);
+    messages.value.push({ id: nextId(), role: 'assistant', content: response.reply });
+  } catch (error: any) {
+    messages.value.push({
+      id: nextId(),
+      role: 'assistant',
+      content: error.response?.data?.error || 'Failed to regenerate answer.',
     });
   } finally {
     sending.value = false;
@@ -209,7 +316,7 @@ async function selectChat(id: number) {
     const history = await chatbotService.getChatMessages(id);
     
     // Clear current UI and load the historical messages
-    messages.value = history.map(msg => ({
+    messages.value = history.map((msg: ChatMessageResponse) => ({
       id: nextId(),
       role: msg.role,
       content: msg.content
@@ -227,6 +334,26 @@ function newChat() {
   currentChatId.value = null; // Reset the ID so the next message creates a new chat
   input.value = '';
   menuController.close('chat-menu');
+}
+
+async function deleteChat(id: number) {
+  if (!confirm('Are you sure you want to delete this conversation? This cannot be undone.')) {
+    return;
+  }
+
+  try {
+    await chatbotService.deleteChat(id);
+    
+    // Remove from list
+    savedChats.value = savedChats.value.filter(c => c.id !== id);
+    
+    // If the deleted chat was the one currently open, reset the view
+    if (currentChatId.value === id) {
+      newChat();
+    }
+  } catch (err) {
+    console.error('Failed to delete chat:', err);
+  }
 }
 
 async function scrollToBottom() {
@@ -293,6 +420,10 @@ function returnToLexcol() {
   --color: white;
 }
 
+.chat-toolbar ion-menu-button::part(native) {
+  outline: none;
+}
+
 /* ---- Messages container ---- */
 .messages-container {
   max-width: 720px;
@@ -341,7 +472,13 @@ function returnToLexcol() {
   gap: 12px;
 }
 
-.message-row { display: flex; }
+.message-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
 .message-row.user { justify-content: flex-end; }
 .message-row.assistant { justify-content: flex-start; }
 
@@ -366,6 +503,26 @@ function returnToLexcol() {
   color: #1f2937;
   border: 1px solid #e5e7eb;
   border-bottom-left-radius: 4px;
+}
+
+/* ---- Action Buttons (Edit / Regenerate) ---- */
+.msg-action-btn {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  height: 32px;
+  margin: 0;
+  opacity: 0.4;
+  transition: opacity 0.2s ease;
+  flex-shrink: 0;
+}
+
+.msg-action-btn:hover {
+  opacity: 1;
+}
+
+.msg-action-btn ion-icon {
+  font-size: 18px;
+  color: #6b7280;
 }
 
 /* ---- Typing indicator ---- */
@@ -403,7 +560,7 @@ function returnToLexcol() {
 
 .input-wrapper {
   display: flex;
-  align-items: center;             /* ← centers the button */
+  align-items: center;
   gap: 6px;
   max-width: 720px;
   margin: 0 auto;
@@ -411,26 +568,36 @@ function returnToLexcol() {
   border: 1px solid #d1d5db;
   border-radius: 22px;
   background: #f9fafb;
-  min-height: 44px;                /* ← bar slightly taller than the button */
+  min-height: 44px;
 }
 
 .chat-input {
   flex: 1;
-  /* Let Ionic handle the internal padding. 8px top and bottom keeps the bar compact. */
+  min-width: 0;
+
   --padding-start: 0;
   --padding-end: 0;
   --padding-top: 8px;
   --padding-bottom: 8px;
+
   --background: transparent;
   --color: #1f2937;
-  
+
+  --highlight-color-focused: transparent;
+  --highlight-color: transparent;
+
   font-size: 0.95rem;
   min-height: 20px;
   max-height: 100px;
 }
 
-.chat-toolbar ion-menu-button::part(native) {
+.chat-input::part(native) {
+  border: none;
   outline: none;
+  box-shadow: none;
+
+  background: transparent;
+  caret-color: #1f2937;
 }
 
 .send-btn {
@@ -447,7 +614,91 @@ function returnToLexcol() {
 }
 
 .send-btn ion-icon {
-  font-size: 20px;                 /* ← larger, clearly visible icon */
+  font-size: 20px;
+}
+
+/* ---- Inline Edit Mode ---- */
+.inline-edit-wrapper {
+  width: fit-content;
+  max-width: 75%;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #1a1a1a;
+  border-radius: 16px;
+  border-bottom-right-radius: 4px;
+
+  padding: 10px 14px;
+  box-sizing: border-box;
+}
+
+.inline-edit-textarea {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+
+  --background: transparent;
+  --color: white;
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0px;
+  --min-height: 24px;
+
+  font-size: 0.95rem;
+  line-height: 1.5;
+  --highlight-color-focused: transparent;
+--highlight-color: transparent;
+}
+
+/* Force inner parts of the textarea to shrink and hide borders */
+.inline-edit-textarea::part(container) {
+  background: transparent !important;
+  border: none !important;
+}
+
+ion-textarea.inline-edit-textarea::part(native) {
+  height: 24px !important;
+  min-height: 24px !important;
+  max-height: 24px !important;
+  box-sizing: border-box !important;
+}
+
+.inline-edit-textarea::part(native):focus {
+  outline: none;
+  box-shadow: none;
+  caret-color: white;
+}
+
+.inline-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.inline-edit-actions ion-button {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  height: 26px;
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.inline-edit-actions ion-button[fill="clear"] {
+  --color: #9ca3af;
+}
+
+.inline-edit-actions ion-button[color="dark"] {
+  --background: #374151;
+  --color: white;
+  --border-radius: 4px;
 }
 
 /* ---- Menu (mobile) ---- */
@@ -458,12 +709,26 @@ function returnToLexcol() {
   font-size: 0.85rem;
 }
 
-.menu-empty p { margin: 0; }
+.menu-empty p { 
+  margin: 0; 
+}
 
 /* ---- Mobile tweaks ---- */
+@media (max-width: 768px) {
+  /* Make action buttons slightly more visible on touch devices */
+  .msg-action-btn {
+    opacity: 0.8; 
+  }
+}
+
 @media (max-width: 480px) {
-  .messages-container { padding: 1rem 0.75rem; }
-  .message-bubble { max-width: 85%; }
+  .messages-container { 
+    padding: 1rem 0.75rem; 
+  }
+  
+  .message-bubble { 
+    max-width: 85%; 
+  }
 
   .input-bar {
     padding: 6px 12px;

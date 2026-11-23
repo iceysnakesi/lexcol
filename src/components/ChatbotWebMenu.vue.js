@@ -1,5 +1,5 @@
 import { menuController, } from '@ionic/vue';
-import { menuOutline, addOutline, chatbubblesOutline } from 'ionicons/icons';
+import { menuOutline, addOutline, chatbubblesOutline, trashOutline } from 'ionicons/icons';
 const __VLS_props = defineProps();
 const emit = defineEmits();
 const MENU_ID = 'chat-web-menu';
@@ -207,7 +207,7 @@ for (const [chat] of __VLS_vFor(__VLS_nonNull(__VLS_61))) {
     void __VLS_68;
     const { default: __VLS_69 } = __VLS_nonNull(__VLS_65.slots);
     let __VLS_70;
-    /** @ts-ignore @type { | typeof __VLS_components.ionIcon | typeof __VLS_components.IonIcon | typeof __VLS_components['ion-icon']} */
+    /** @ts-ignore @type { | typeof __VLS_components.ionIcon | typeof __VLS_components.IonIcon | typeof __VLS_components['ion-icon'] | typeof __VLS_components.ionIcon | typeof __VLS_components.IonIcon | typeof __VLS_components['ion-icon']} */
     ionIcon;
     // @ts-ignore
     const __VLS_71 = __VLS_asFunctionalComponent1(__VLS_70, new __VLS_70({
@@ -230,10 +230,53 @@ for (const [chat] of __VLS_vFor(__VLS_nonNull(__VLS_61))) {
     __VLS_asFunctionalElement1(__VLS_intrinsics.h3, __VLS_intrinsics.h3)({});
     (chat.title);
     __VLS_asFunctionalElement1(__VLS_intrinsics.p, __VLS_intrinsics.p)({});
-    (chat.lastMessage);
+    (chat.last_message || 'No messages yet');
     // @ts-ignore
     [chatbubblesOutline,];
     var __VLS_78;
+    let __VLS_81;
+    /** @ts-ignore @type { | typeof __VLS_components.ionButton | typeof __VLS_components.IonButton | typeof __VLS_components['ion-button'] | typeof __VLS_components.ionButton | typeof __VLS_components.IonButton | typeof __VLS_components['ion-button']} */
+    ionButton;
+    // @ts-ignore
+    const __VLS_82 = __VLS_asFunctionalComponent1(__VLS_81, new __VLS_81({
+        // @ts-ignore
+        ...{ 'onClick': {} }, slot: "end", fill: "clear", color: "danger",
+    }));
+    const __VLS_83 = __VLS_82({
+        ...{ 'onClick': {} },
+        slot: "end",
+        fill: "clear",
+        color: "danger",
+    }, ...__VLS_functionalComponentArgsRest(__VLS_82));
+    let __VLS_86;
+    const __VLS_87 = {
+        /** @type {typeof __VLS_86.click} */
+        onClick: // @ts-ignore
+        (...[$event]) => {
+            void $event;
+            return (__VLS_unwrap(emit, {})('delete', chat.id));
+            // @ts-ignore
+            [emit,];
+        },
+    };
+    void __VLS_87;
+    const { default: __VLS_88 } = __VLS_nonNull(__VLS_84.slots);
+    let __VLS_89;
+    /** @ts-ignore @type { | typeof __VLS_components.ionIcon | typeof __VLS_components.IonIcon | typeof __VLS_components['ion-icon']} */
+    ionIcon;
+    // @ts-ignore
+    const __VLS_90 = __VLS_asFunctionalComponent1(__VLS_89, new __VLS_89({
+        // @ts-ignore
+        slot: "icon-only", icon: (__VLS_unwrap(trashOutline, {})),
+    }));
+    const __VLS_91 = __VLS_90({
+        slot: "icon-only",
+        icon: (__VLS_unwrap(trashOutline, {})),
+    }, ...__VLS_functionalComponentArgsRest(__VLS_90));
+    // @ts-ignore
+    [trashOutline,];
+    var __VLS_84;
+    var __VLS_85;
     // @ts-ignore
     [];
     var __VLS_65;
@@ -241,61 +284,61 @@ for (const [chat] of __VLS_vFor(__VLS_nonNull(__VLS_61))) {
     // @ts-ignore
     [];
 }
-let __VLS_81;
+let __VLS_94;
 /** @ts-ignore @type { | typeof __VLS_components.ionItemDivider | typeof __VLS_components.IonItemDivider | typeof __VLS_components['ion-item-divider']} */
 ionItemDivider;
 // @ts-ignore
-const __VLS_82 = __VLS_asFunctionalComponent1(__VLS_81, new __VLS_81({
+const __VLS_95 = __VLS_asFunctionalComponent1(__VLS_94, new __VLS_94({
 // @ts-ignore
 }));
-const __VLS_83 = __VLS_82({}, ...__VLS_functionalComponentArgsRest(__VLS_82));
-let __VLS_86;
+const __VLS_96 = __VLS_95({}, ...__VLS_functionalComponentArgsRest(__VLS_95));
+let __VLS_99;
 /** @ts-ignore @type { | typeof __VLS_components.ionItem | typeof __VLS_components.IonItem | typeof __VLS_components['ion-item'] | typeof __VLS_components.ionItem | typeof __VLS_components.IonItem | typeof __VLS_components['ion-item']} */
 ionItem;
 // @ts-ignore
-const __VLS_87 = __VLS_asFunctionalComponent1(__VLS_86, new __VLS_86({
+const __VLS_100 = __VLS_asFunctionalComponent1(__VLS_99, new __VLS_99({
     // @ts-ignore
     ...{ 'onClick': {} }, button: true,
 }));
-const __VLS_88 = __VLS_87({
+const __VLS_101 = __VLS_100({
     ...{ 'onClick': {} },
     button: true,
-}, ...__VLS_functionalComponentArgsRest(__VLS_87));
-let __VLS_91;
-const __VLS_92 = {
-    /** @type {typeof __VLS_91.click} */
+}, ...__VLS_functionalComponentArgsRest(__VLS_100));
+let __VLS_104;
+const __VLS_105 = {
+    /** @type {typeof __VLS_104.click} */
     onClick: (handleNew),
 };
-void __VLS_92;
-const { default: __VLS_93 } = __VLS_nonNull(__VLS_89.slots);
-let __VLS_94;
+void __VLS_105;
+const { default: __VLS_106 } = __VLS_nonNull(__VLS_102.slots);
+let __VLS_107;
 /** @ts-ignore @type { | typeof __VLS_components.ionIcon | typeof __VLS_components.IonIcon | typeof __VLS_components['ion-icon']} */
 ionIcon;
 // @ts-ignore
-const __VLS_95 = __VLS_asFunctionalComponent1(__VLS_94, new __VLS_94({
+const __VLS_108 = __VLS_asFunctionalComponent1(__VLS_107, new __VLS_107({
     // @ts-ignore
     slot: "start", icon: (__VLS_unwrap(addOutline, {})),
 }));
-const __VLS_96 = __VLS_95({
+const __VLS_109 = __VLS_108({
     slot: "start",
     icon: (__VLS_unwrap(addOutline, {})),
-}, ...__VLS_functionalComponentArgsRest(__VLS_95));
-let __VLS_99;
+}, ...__VLS_functionalComponentArgsRest(__VLS_108));
+let __VLS_112;
 /** @ts-ignore @type { | typeof __VLS_components.ionLabel | typeof __VLS_components.IonLabel | typeof __VLS_components['ion-label'] | typeof __VLS_components.ionLabel | typeof __VLS_components.IonLabel | typeof __VLS_components['ion-label']} */
 ionLabel;
 // @ts-ignore
-const __VLS_100 = __VLS_asFunctionalComponent1(__VLS_99, new __VLS_99({
+const __VLS_113 = __VLS_asFunctionalComponent1(__VLS_112, new __VLS_112({
 // @ts-ignore
 }));
-const __VLS_101 = __VLS_100({}, ...__VLS_functionalComponentArgsRest(__VLS_100));
-const { default: __VLS_104 } = __VLS_nonNull(__VLS_102.slots);
+const __VLS_114 = __VLS_113({}, ...__VLS_functionalComponentArgsRest(__VLS_113));
+const { default: __VLS_117 } = __VLS_nonNull(__VLS_115.slots);
 // @ts-ignore
 [addOutline,];
-var __VLS_102;
+var __VLS_115;
 // @ts-ignore
 [];
-var __VLS_89;
-var __VLS_90;
+var __VLS_102;
+var __VLS_103;
 // @ts-ignore
 [];
 var __VLS_46;
