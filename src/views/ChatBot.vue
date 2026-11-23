@@ -36,7 +36,8 @@
             <ion-icon slot="start" :icon="chatbubblesOutline"></ion-icon>
             <ion-label>
               <h3>{{ chat.title }}</h3>
-              <p>{{ chat.lastMessage }}</p>
+              <!-- Change this line -->
+              <p>{{ chat.last_message || 'No messages yet' }}</p>
             </ion-label>
           </ion-item>
 
@@ -56,7 +57,7 @@
     </ion-menu>
 
     <!-- Chat layout -->
-    <div id="chat-main-content" class="ion-page chat-layout">
+    <div id="chat-main-content" class="chat-layout">
       <!-- Mobile-only chat header -->
       <ion-header class="mobile-chat-header">
         <ion-toolbar class="chat-toolbar">
@@ -130,17 +131,14 @@ import {
 } from 'ionicons/icons';
 import PageHeader from '@/components/PageHeader.vue';
 import ChatbotWebMenu from '@/components/ChatbotWebMenu.vue';
+import { chatbotService, type SavedChat } from '@/services/chatbotService';
+import { onIonViewWillEnter } from '@ionic/vue'; // Make sure this is imported
+
 
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-}
-
-interface SavedChat {
-  id: string;
-  title: string;
-  lastMessage: string;
 }
 
 const router = useRouter();
@@ -149,14 +147,21 @@ const messages = ref<ChatMessage[]>([]);
 const input = ref('');
 const sending = ref(false);
 const contentRef = ref<HTMLIonContentElement>();
-
-// Placeholder for future chat history from backend
 const savedChats = ref<SavedChat[]>([]);
+const currentChatId = ref<number | null>(null);
 
 let msgCounter = 0;
 function nextId(): string {
   return `msg-${++msgCounter}-${Date.now()}`;
 }
+
+onIonViewWillEnter(async () => {
+  try {
+    savedChats.value = await chatbotService.getChats();
+  } catch (err) {
+    console.error('Failed to load chats:', err);
+  }
+});
 
 async function sendMessage() {
   const text = input.value.trim();
@@ -167,32 +172,69 @@ async function sendMessage() {
   sending.value = true;
   await scrollToBottom();
 
-  // TODO: replace with actual chatbot API call
-  await new Promise((r) => setTimeout(r, 700));
+  try {
+    const response = await chatbotService.sendMessage(text, currentChatId.value);
 
-  messages.value.push({
-    id: nextId(),
-    role: 'assistant',
-    content: 'The chatbot API is not connected yet. This is a placeholder response.',
-  });
-  sending.value = false;
-  await scrollToBottom();
+    // If it was a new chat, the backend returns the new chatId
+    if (!currentChatId.value) {
+      currentChatId.value = response.chatId;
+      // Refresh the saved chats list so it appears in the menu immediately
+      savedChats.value = await chatbotService.getChats();
+    }
+
+    messages.value.push({
+      id: nextId(),
+      role: 'assistant',
+      content: response.reply,
+    });
+  } catch (error: any) {
+    console.error('Chat error:', error);
+    messages.value.push({
+      id: nextId(),
+      role: 'assistant',
+      content: error.response?.data?.error || 'Sorry, I encountered an error. Please try again.',
+    });
+  } finally {
+    sending.value = false;
+    await scrollToBottom();
+  }
 }
 
-async function scrollToBottom() {
-  await nextTick();
-  await contentRef.value?.scrollToBottom(250);
+async function selectChat(id: number) {
+  if (sending.value) return;
+  menuController.close('chat-menu');
+  
+  try {
+    // Fetch messages for this chat
+    const history = await chatbotService.getChatMessages(id);
+    
+    // Clear current UI and load the historical messages
+    messages.value = history.map(msg => ({
+      id: nextId(),
+      role: msg.role,
+      content: msg.content
+    }));
+    
+    currentChatId.value = id;
+    await scrollToBottom();
+  } catch (err) {
+    console.error('Failed to load chat messages:', err);
+  }
 }
 
 function newChat() {
   messages.value = [];
+  currentChatId.value = null; // Reset the ID so the next message creates a new chat
   input.value = '';
   menuController.close('chat-menu');
 }
 
-function selectChat(_id: string) {
-  // TODO: load this conversation's messages from the backend
-  menuController.close('chat-menu');
+async function scrollToBottom() {
+  await nextTick();
+  const el = (contentRef.value as any)?.$el || contentRef.value; 
+  if (el && typeof el.scrollToBottom === 'function') {
+    await el.scrollToBottom(250);
+  }
 }
 
 function returnToLexcol() {

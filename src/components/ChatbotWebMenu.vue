@@ -29,18 +29,19 @@
           <p>No conversations yet</p>
         </div>
 
-        <ion-item
-          v-for="chat in savedChats"
-          :key="chat.id"
-          button
-          @click="handleSelect(chat.id)"
-        >
-          <ion-icon slot="start" :icon="chatbubblesOutline" />
-          <ion-label>
-            <h3>{{ chat.title }}</h3>
-            <p>{{ chat.lastMessage }}</p>
-          </ion-label>
-        </ion-item>
+          <ion-item
+            v-for="chat in savedChats"
+            :key="chat.id"
+            button
+            @click="handleSelect(chat.id)"
+          >
+            <ion-icon slot="start" :icon="chatbubblesOutline" />
+            <ion-label>
+              <h3>{{ chat.title }}</h3>
+              <!-- Change this line -->
+              <p>{{ chat.last_message || 'No messages yet' }}</p>
+            </ion-label>
+          </ion-item>
 
         <ion-item-divider />
 
@@ -61,17 +62,19 @@ import {
 } from '@ionic/vue';
 import { menuOutline, addOutline, chatbubblesOutline } from 'ionicons/icons';
 
+// Match the service's interface
 interface SavedChat {
-  id: string;
+  id: number;
   title: string;
-  lastMessage: string;
+  last_message: string;
+  updated_at: string;
 }
 
 defineProps<{ savedChats: SavedChat[] }>();
 
 const emit = defineEmits<{
   (e: 'new'): void;
-  (e: 'select', id: string): void;
+  (e: 'select', id: number): void; // Changed from string to number
 }>();
 
 const MENU_ID = 'chat-web-menu';
@@ -85,7 +88,7 @@ function handleNew() {
   emit('new');
 }
 
-function handleSelect(id: string) {
+function handleSelect(id: number) {
   menuController.close(MENU_ID);
   emit('select', id);
 }
