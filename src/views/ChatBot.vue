@@ -38,7 +38,7 @@
             <ion-label>
               <h3>{{ chat.title }}</h3>
               <!-- Change this line -->
-              <p>{{ chat.last_message || 'No messages yet' }}</p>
+              <p class="chat-preview">{{ chat.last_message || 'No messages yet' }}</p>            
             </ion-label>
           </ion-item>
 
@@ -615,6 +615,13 @@ function returnToLexcol() {
 
 .send-btn ion-icon {
   font-size: 20px;
+}
+
+.chat-preview {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* ---- Inline Edit Mode ---- */

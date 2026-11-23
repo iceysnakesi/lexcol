@@ -229,7 +229,10 @@ for (const [chat] of __VLS_vFor(__VLS_nonNull(__VLS_61))) {
     const { default: __VLS_80 } = __VLS_nonNull(__VLS_78.slots);
     __VLS_asFunctionalElement1(__VLS_intrinsics.h3, __VLS_intrinsics.h3)({});
     (chat.title);
-    __VLS_asFunctionalElement1(__VLS_intrinsics.p, __VLS_intrinsics.p)({});
+    __VLS_asFunctionalElement1(__VLS_intrinsics.p, __VLS_intrinsics.p)({
+        ...{ class: "chat-preview" },
+    });
+    /** @type {__VLS_StyleScopedClasses['chat-preview']} */ ;
     (chat.last_message || 'No messages yet');
     // @ts-ignore
     [chatbubblesOutline,];

@@ -38,7 +38,7 @@
             <ion-icon slot="start" :icon="chatbubblesOutline"></ion-icon>
             <ion-label>
               <h3>{{ chat.title }}</h3>
-              <p>{{ chat.last_message || 'No messages yet' }}</p>
+              <p class="chat-preview">{{ chat.last_message || 'No messages yet' }}</p>            
             </ion-label>
             
             <ion-button 
@@ -148,6 +148,13 @@ function handleSelect(id: number) {
 
 .menu-trigger-btn ion-icon {
   font-size: 22px;
+}
+
+.chat-preview {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* Menu chrome */
